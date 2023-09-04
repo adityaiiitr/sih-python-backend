@@ -3,6 +3,9 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from textblob import TextBlob
 
+from db import createConnection
+collection = createConnection("aditya")
+
 app = FastAPI()
 
 # Example route
@@ -27,4 +30,10 @@ async def analyze_sentiment(request: SentimentRequest):
     else:
         sentiment = "Positive"
 
-    return {"sentiment": sentiment, "polarity": polarity}
+    responseBody = {"text":text,"sentiment": sentiment, "polarity": polarity}
+
+    inserted_item = collection.insert_one(responseBody)
+    # print(inserted_item)
+    # print(type(inserted_item))
+
+    return {"success":True, "id":str(inserted_item.inserted_id),"text":text,"sentiment": sentiment, "polarity": polarity}
