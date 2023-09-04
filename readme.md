@@ -5,7 +5,7 @@ Make sure you dont push the code in master branch!
 
 ## Getting Started
 
-Contributors need to install Python & Git before they can run your API.
+Contributors need to install Python & Git before you can run API.
 1. Clone the Repository.
 ```bash
 git clone https://github.com/adityaiiitr/sih-python-backend.git
@@ -27,7 +27,7 @@ myvenv\Scripts\activate
 ```bash
 pip install -r requirements.txt
 ```
-6. Run local server.
+6. Run local server. (create a .env file following the template)
 ```bash
 uvicorn main:app --reload --port 3000
 ```
