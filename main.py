@@ -53,3 +53,12 @@ async def analyze_sentiment(request: SentimentRequest, api_key: str = Depends(au
     # print(type(inserted_item))
 
     return {"success":True, "id":str(inserted_item.inserted_id),"text":text,"sentiment": sentiment, "polarity": polarity}
+
+from scraper import scrapeLink
+class ScraperRequest(BaseModel):
+    query:str
+    lang:str='en'
+@app.post("/scrape_news")
+async def scrape_news(request: ScraperRequest, api_key: str = Depends(authenticate_api_key)):
+    response = scrapeLink(query=request.query,lang=request.lang)
+    return {"success":True, "result":response}
