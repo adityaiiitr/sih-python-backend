@@ -87,11 +87,19 @@ def pIB_news_link(
     published_from: str = Query(None, description="Start date for filtering Ex: 09-Sep-2023-12-00 "),
     published_to: str = Query(None, description="End date for filtering Ex: 10-Sep-2023-12-00"),
 ):
-    published_from = published_from.replace(published_from[3:6], month_map[published_from[3:6].upper()])
-    published_to = published_to.replace(published_to[3:6], month_map[published_to[3:6].upper()])
+    if published_from and published_to:
+        published_from = published_from.replace(published_from[3:6], month_map[published_from[3:6].upper()])
+        published_to = published_to.replace(published_to[3:6], month_map[published_to[3:6].upper()])
+        published_from=published_from.replace("-"," ")
+        published_to=published_to.replace("-"," ")
+    elif published_from:
+        published_from = published_from.replace(published_from[3:6], month_map[published_from[3:6].upper()])
+        published_from=published_from.replace("-"," ")
 
-    published_from=published_from.replace("-"," ")
-    published_to=published_to.replace("-"," ")
+    elif published_to:
+        published_to = published_to.replace(published_to[3:6], month_map[published_to[3:6].upper()])
+        published_to=published_to.replace("-"," ")
+
     pib_collection = createConnection("piblinkv2")
     # {"publishedAt": {"$gte": "09 Sep 2023 12:00"}}
     filter_query = {}
