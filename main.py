@@ -3,8 +3,8 @@ from bson import ObjectId
 from fastapi.responses import JSONResponse
 import json
 from pydantic import BaseModel
-from textblob import TextBlob
-
+import torch
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 from dotenv import load_dotenv
 import os
 
@@ -55,23 +55,15 @@ class SentimentRequest(BaseModel):
 @app.post("/analyze_sentiment")
 async def analyze_sentiment(request: SentimentRequest):
     text = request.text
-    t1 = TextBlob(text)
-    polarity = t1.sentiment.polarity
-
-    if polarity < 0:
-        sentiment = "Negative"
-    elif polarity == 0:
-        sentiment = "Neutral"
-    else:
-        sentiment = "Positive"
-
-    responseBody = {"text":text,"sentiment": sentiment, "polarity": polarity}
+    sentiment_pipeline = pipeline("sentiment-analysis")
+    senti = sentiment_pipeline(text)
+    responseBody = {"text":text,"sentiment": senti[0]['label'], "polarity": senti[0]['score']}
 
     inserted_item = collection.insert_one(responseBody)
     # print(inserted_item)
     # print(type(inserted_item))
 
-    return {"success":True, "id":str(inserted_item.inserted_id),"text":text,"sentiment": sentiment, "polarity": polarity}
+    return {"success":True, "id":str(inserted_item.inserted_id),"text":text,"sentiment": senti[0]['label'], "polarity": senti[0]['score']}
 
 from scraper import scrapeLink
 class ScraperRequest(BaseModel):
