@@ -7,6 +7,7 @@ import torch
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 from dotenv import load_dotenv
 import os
+from transformers import pipeline
 
 load_dotenv() 
 
