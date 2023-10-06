@@ -100,7 +100,7 @@ def pIB_news_link(
         published_to = published_to.replace(published_to[3:6], month_map[published_to[3:6].upper()])
         published_to=published_to.replace("-"," ")
 
-    pib_collection = createConnection("piblinkv2")
+    pib_collection = createConnection("piblinkv3")
     # {"publishedAt": {"$gte": "09 Sep 2023 12:00"}}
     filter_query = {}
     if published_from and published_to:
