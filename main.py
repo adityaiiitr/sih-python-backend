@@ -126,14 +126,7 @@ def pIB_news_link(
         pibnodal = document.get('pibnodal', '')
         content = document.get('content', '')
         publishedAt = document.get('publishedAt', '')
-
-        
-# title
-# content
-# ministry
-# pibnodal
-# publishedAt
-# prid
+        lang = document.get('lang', '') 
 
 
         json_object = {
@@ -143,8 +136,8 @@ def pIB_news_link(
             'ministry': ministry,
             'pibnodal': pibnodal,
             'publishedAt': publishedAt,
-            'prid': prid
-
+            'prid': prid,
+            'lang':lang
         }
         json_array.append(json_object)
 
