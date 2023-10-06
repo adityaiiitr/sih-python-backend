@@ -10,6 +10,21 @@ import os
 
 load_dotenv() 
 
+month_map = {
+    "JAN": "01",
+    "FEB": "02",
+    "MAR": "03",
+    "APR": "04",
+    "MAY": "05",
+    "JUN": "06",
+    "JUL": "07",
+    "AUG": "08",
+    "SEP": "09",
+    "OCT": "10",
+    "NOV": "11",
+    "DEC": "12",
+}
+
 from fastapi.security.api_key import APIKeyHeader
 
 api_key = APIKeyHeader(name="Authorization")
@@ -69,22 +84,35 @@ async def scrape_news_link(request: ScraperRequest):
 
 @app.get("/pib_news")
 def pIB_news_link(
-    start_date: str = Query(None, description="Start date for filtering (YYYY-MM-DD)"),
-    end_date: str = Query(None, description="End date for filtering (YYYY-MM-DD)"),
-    start_time: str = Query(None, description="Start time for filtering (HH:MM:SS)"),
-    end_time: str = Query(None, description="End time for filtering (HH:MM:SS)")
+    published_from: str = Query(None, description="Start date for filtering Ex: 09-Sep-2023-12-00 "),
+    published_to: str = Query(None, description="End date for filtering Ex: 10-Sep-2023-12-00"),
 ):
-    pib_collection = createConnection("piblink")
+    if published_from and published_to:
+        published_from = published_from.replace(published_from[3:6], month_map[published_from[3:6].upper()])
+        published_to = published_to.replace(published_to[3:6], month_map[published_to[3:6].upper()])
+        published_from=published_from.replace("-"," ")
+        published_to=published_to.replace("-"," ")
+    elif published_from:
+        published_from = published_from.replace(published_from[3:6], month_map[published_from[3:6].upper()])
+        published_from=published_from.replace("-"," ")
 
+    elif published_to:
+        published_to = published_to.replace(published_to[3:6], month_map[published_to[3:6].upper()])
+        published_to=published_to.replace("-"," ")
+
+    pib_collection = createConnection("piblinkv3")
+    # {"publishedAt": {"$gte": "09 Sep 2023 12:00"}}
     filter_query = {}
-    if start_date:
-        filter_query["timestamp.date"] = {"$gte": start_date}
-    if end_date:
-        filter_query["timestamp.date"] = {"$lte": end_date}
-    if start_time:
-        filter_query["timestamp.time"] = {"$gte": start_time}
-    if end_time:
-        filter_query["timestamp.time"] = {"$lte": end_time}
+    if published_from and published_to:
+        filter_query["publishedAt"] = {
+            "$gte": published_from,
+            "$lte": published_to
+        }
+    elif published_from:
+        filter_query["publishedAt"] = {"$gte": published_from}
+    elif published_to:
+        filter_query["publishedAt"] = {"$lte": published_to}
+
 
     data = pib_collection.find(filter_query)
 
@@ -93,14 +121,22 @@ def pIB_news_link(
     for document in data:
         document_id = str(document['_id'])
         title = document.get('title', '')
-        url = document.get('url', '')
-        timestamp = document.get('timestamp', '')
+        prid = document.get('prid', '')
+        ministry = document.get('ministry', '')
+        pibnodal = document.get('pibnodal', '')
+        content = document.get('content', '')
+        publishedAt = document.get('publishedAt', '')
         lang = document.get('lang', '') 
+
+
         json_object = {
             'id': document_id,
             'title': title,
-            'url': url,
-            'timestamp': timestamp,
+            'content': content,
+            'ministry': ministry,
+            'pibnodal': pibnodal,
+            'publishedAt': publishedAt,
+            'prid': prid,
             'lang':lang
         }
         json_array.append(json_object)
