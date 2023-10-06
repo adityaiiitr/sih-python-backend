@@ -95,12 +95,13 @@ def pIB_news_link(
         title = document.get('title', '')
         url = document.get('url', '')
         timestamp = document.get('timestamp', '')
-
+        lang = document.get('lang', '') 
         json_object = {
             'id': document_id,
             'title': title,
             'url': url,
-            'timestamp': timestamp
+            'timestamp': timestamp,
+            'lang':lang
         }
         json_array.append(json_object)
 
